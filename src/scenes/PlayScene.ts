@@ -1,3 +1,4 @@
+import { PRELOAD_CONFIG } from "..";
 import { Player } from "../entities/Player";
 import { SpriteWithDynamicBody } from "../types";
 import { GameScene } from "./GameScene";
@@ -10,6 +11,7 @@ class PlayScene extends GameScene {
 
     spawnInterval: number = 1500;
     spawnTime: number = 0;
+    obstacleSpeed: number = 10;
 
     constructor() {
         super("PlayScene");
@@ -53,12 +55,16 @@ class PlayScene extends GameScene {
     }
 
     update(time: number, delta: number): void {
+        if (!this.isGameRunning) { return; }
+
         this.spawnTime += delta;
 
         if (this.spawnTime >= this.spawnInterval) {
             this.spawnObstacle();
             this.spawnTime = 0;
         }
+
+        Phaser.Actions.IncX(this.obstacles.getChildren(), -this.obstacleSpeed);
     }
 
     createEnvironment() {
@@ -72,7 +78,7 @@ class PlayScene extends GameScene {
     }
 
     spawnObstacle() {
-        const obstacleNum = Math.floor(Math.random() * 6) + 1;
+        const obstacleNum = Math.floor(Math.random() * PRELOAD_CONFIG.cactusesCount) + 1;
         const distance = Phaser.Math.Between(600, 900);
 
         this.obstacles
