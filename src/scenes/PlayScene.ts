@@ -21,7 +21,8 @@ class PlayScene extends GameScene {
 
     spawnInterval: number = 1500;
     spawnTime: number = 0;
-    gameSpeed: number = 5;
+    gameSpeed: number = 6.5;
+    gameSpeedModifier: number = 1;
 
     constructor() {
         super("PlayScene");
@@ -53,11 +54,14 @@ class PlayScene extends GameScene {
 
         if (this.scoreDeltaTime >= this.scoreInterval) {
             this.score++;
-            console.log(this.score);
             this.scoreDeltaTime = 0;
+
+            if (this.score % 100 === 0) {
+                this.gameSpeedModifier += 0.2;
+            }
         }
 
-        Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed);
+        Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed * this.gameSpeedModifier);
         Phaser.Actions.IncX(this.clouds.getChildren(), -0.5);
 
         const score = Array.from(String(this.score), Number);
@@ -79,7 +83,7 @@ class PlayScene extends GameScene {
             }
         });
 
-        this.ground.tilePositionX += this.gameSpeed;
+        this.ground.tilePositionX += (this.gameSpeed * this.gameSpeedModifier);
     }
 
     createEnvironment() {
@@ -201,7 +205,7 @@ class PlayScene extends GameScene {
             this.spawnTime = 0;
             this.score = 0;
             this.scoreDeltaTime = 0;
-            this.gameSpeed = 5;
+            this.gameSpeedModifier = 1;
         });
     }
 
