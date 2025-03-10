@@ -10,9 +10,14 @@ class PlayScene extends GameScene {
     clouds: Phaser.GameObjects.Group;
     startTrigger: SpriteWithDynamicBody;
 
+    scoreText: Phaser.GameObjects.Text;
     gameOverText: Phaser.GameObjects.Image;
     restartText: Phaser.GameObjects.Image;
     gameOverContainer: Phaser.GameObjects.Container;
+
+    score: number = 0;
+    scoreInterval: number = 100;
+    scoreDeltaTime: number = 0;
 
     spawnInterval: number = 1500;
     spawnTime: number = 0;
@@ -28,6 +33,7 @@ class PlayScene extends GameScene {
         this.createObstacles();
         this.createGameoverContainer();
         this.createAnimations();
+        this.createScore();
 
         this.handleGameStart();
         this.handleObstacleCollisions();
@@ -38,14 +44,28 @@ class PlayScene extends GameScene {
         if (!this.isGameRunning) { return; }
 
         this.spawnTime += delta;
+        this.scoreDeltaTime += delta;
 
         if (this.spawnTime >= this.spawnInterval) {
             this.spawnObstacle();
             this.spawnTime = 0;
         }
 
+        if (this.scoreDeltaTime >= this.scoreInterval) {
+            this.score++;
+            console.log(this.score);
+            this.scoreDeltaTime = 0;
+        }
+
         Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed);
         Phaser.Actions.IncX(this.clouds.getChildren(), -0.5);
+
+        const score = Array.from(String(this.score), Number);
+        for (let i = 0; i < 5 - String(this.score).length; i++) {
+            score.unshift(0);
+        }
+
+        this.scoreText.setText(score.join(""));
 
         this.obstacles.getChildren().forEach((obstacle: SpriteWithDynamicBody) => {
             if (obstacle.getBounds().right < 0) {
@@ -104,6 +124,15 @@ class PlayScene extends GameScene {
         });
     }
 
+    createScore() {
+        this.scoreText = this.add.text(this.gameWidth, 0, "00000", {
+            fontSize: 30,
+            fontFamily: "Arial",
+            color: "#535353",
+            resolution: 5
+        }).setOrigin(1, 0).setAlpha(0);
+    }
+
     spawnObstacle() {
         const obstaclesCount = PRELOAD_CONFIG.cactusesCount + PRELOAD_CONFIG.birdsCount;
         const obstacleNum = Math.floor(Math.random() * obstaclesCount) + 1;
@@ -152,6 +181,7 @@ class PlayScene extends GameScene {
                         this.ground.width = this.gameWidth;
                         this.player.setVelocityX(0);
                         this.clouds.setAlpha(1);
+                        this.scoreText.setAlpha(1);
                         this.isGameRunning = true;
                     }
                 }
@@ -169,6 +199,8 @@ class PlayScene extends GameScene {
             this.gameOverContainer.setAlpha(1);
 
             this.spawnTime = 0;
+            this.score = 0;
+            this.scoreDeltaTime = 0;
             this.gameSpeed = 5;
         });
     }
