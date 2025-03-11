@@ -25,6 +25,8 @@ class PlayScene extends GameScene {
     gameSpeed: number = 6.5;
     gameSpeedModifier: number = 1;
 
+    progressSound: Phaser.Sound.HTML5AudioSound;
+
     constructor() {
         super("PlayScene");
     }
@@ -40,6 +42,8 @@ class PlayScene extends GameScene {
         this.handleGameStart();
         this.handleObstacleCollisions();
         this.handleGameRestart();
+
+        this.progressSound = this.sound.add("progress", {volume: 0.5}) as Phaser.Sound.HTML5AudioSound;
     }
 
     update(time: number, delta: number): void {
@@ -59,7 +63,7 @@ class PlayScene extends GameScene {
 
             if (this.score % 100 === 0) {
                 this.gameSpeedModifier += 0.2;
-
+                this.progressSound.play();
                 this.tweens.add({
                     targets: this.scoreText,
                     duration: 100,
