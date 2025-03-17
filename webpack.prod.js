@@ -5,6 +5,11 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = merge(common, {
   mode: 'production',
+  output: {
+    filename: '[name].js',
+    path: __dirname + '/docs',
+    clean: true,
+  },
   devtool: false,
   performance: {
     maxEntrypointSize: 90000,
